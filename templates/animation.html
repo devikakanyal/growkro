@@ -1,0 +1,65 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrowKaro - Har Kisan Ka Digital Sathi</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        body {
+            background-color: #fffffd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+        }
+        .animation-container {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background-color: #f3fadc;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="animation-container">
+        {% load static %}
+
+        <img id="stage1" src="{% static 'Stage1.jpg' %}" style="position: absolute; opacity: 1; width: 200px; height: auto; transform: scale(0.9); bottom: 0;" />
+        <img id="stage2" src="{% static 'Stage2.jpg' %}" style="position: absolute; opacity: 0; width: 200px; height: auto; transform: scale(0.9); bottom: 0;" />
+        <img id="stage3" src="{% static 'Stage3.jpg' %}" style="position: absolute; opacity: 0; width: 200px; height: auto; transform: scale(0.9); bottom: 0;" />
+        <img id="stage4" src="{% static 'Stage4.jpg' %}" style="position: absolute; opacity: 0; width: 200px; height: auto; transform: scale(0.9); bottom: 0;" />
+        <img id="stage5" src="{% static 'Stage5.jpg' %}" style="position: absolute; opacity: 0; width: 200px; height: auto; transform: scale(0.9); bottom: 0;" />
+        <img id="stage6" src="{% static 'Stage6.jpg' %}" style="position: absolute; opacity: 0; width: 200px; height: auto; transform: scale(0.9); bottom: 0;" />
+        
+    </div>
+
+    <script>
+        let stages = ["#stage1", "#stage2", "#stage3", "#stage4", "#stage5", "#stage6"];
+        let delayTime = 0;
+
+        stages.forEach((stage, index) => {
+            gsap.to(stage, { duration: 1.5, opacity: 1, scale: 1, delay: delayTime, ease: "power2.inOut" });
+            if (index > 0) {
+                gsap.to(stages[index - 1], { duration: 1.5, opacity: 0, scale: 0.8, delay: delayTime, ease: "power2.inOut" });
+            }
+            delayTime += 0.9;
+        });
+        
+        gsap.to(".animation-container", { duration: 1.5, opacity: 0, delay: delayTime + 1, ease: "power2.inOut", onComplete: () => {
+            window.location.href = "{% url 'home' %}";
+        }});
+    </script>
+    <script src="{% static 'tts.js' %}"></script>
+</body>
+</html>

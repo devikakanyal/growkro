@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrowKaro - Har Kisan Ka Digital Sathi</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
+    <style>
+        {% load static %}
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        .chat-container {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 350px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat-box {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background: #cbcd53;
+            color: black;
+            align-self: flex-end;
+            text-align: right;
+        }
+        .bot-message {
+            background: #929b46;
+            color: white;
+            align-self: flex-start;
+            text-align: left;
+        }
+        .input-container {
+            display: flex;
+            margin-top: 10px;
+        }
+        .input-container input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .input-container button {
+            padding: 10px;
+            background: #b0ba55;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        .input-container button:hover {
+            background: #c7d163;
+        }
+        .chat-header {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .chat-header img {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+        }
+
+        .hero {
+            background: url("{% static 'mybg.jpg' %}") no-repeat center center fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            text-align: center;
+        }
+        .feature-card {
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: scale(1.05);
+        }
+        .welcome-text {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(45deg,#6a6f3c,#64683c, #606439);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+        }
+        .menu {
+            background: #fffffd;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .menu-links {
+            display: flex;
+            gap: 2rem;
+        }
+       
+        .menu-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .menu-toggle-wrapper {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 80px;
+            padding-left: 20px;
+        }
+        .menu-toggle {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .menu-toggle div {
+            width: 30px;
+            height: 4px;
+            background: #333;
+            margin: 5px;
+            transition: 0.3s;
+        }
+        .side-menu {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 250px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .side-menu.show {
+            transform: translateX(0);
+        }
+        .side-menu a {
+            text-decoration: none;
+            color: #333;
+            padding: 10px 0;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+        }
+        .language-btn {
+            position: fixed;
+            top: 70px; /* Moves it below the navbar */
+            right: 20px;
+            background-color: #4A7023;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1100; /* Ensures it stays above other elements */
+        }
+
+        #google_translate_element {
+            display: none;
+            position: fixed;
+            top: 120px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        @media (max-width: 768px) {
+            .menu-links {
+                display: none;
+            }
+            .menu-toggle-wrapper {
+                justify-content: flex-start;
+                padding-left: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="menu">
+        <span class="text-xl font-bold">🌿 GrowKaro</span>
+        <div class="menu-links">
+            <a href="#">Home</a>
+            <a href="#">About Us</a>
+            <a href="#">Contact Us</a>
+        </div>
+        <!-- Language Selector Button -->
+        <div class="language-btn" onclick="toggleTranslateMenu()">🌍 Language</div>
+        <div id="google_translate_element"></div>
+    </nav>
+     
+    <!-- Menu Toggle Button Below Header -->
+    <div class="menu-toggle-wrapper">
+        <div class="menu-toggle" onclick="toggleSideMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    
+    <!-- Collapsible Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <a href="#" onclick="toggleSideMenu()">&times; Close</a>
+        <a href="#">AI Chatbot</a>
+        <a href="prediction.html">Crop Prediction</a>
+        <a href="#">Govt Policies</a>
+        <a href="#">Marketplace</a>
+        <a href="#">Home Gardening</a>
+    </div>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="welcome-text" id="welcomeText">Welcome to GrowKaro</h1>
+        <h1 class="text-4xl font-bold mt-4" data-aos="fade-up">Empowering Farmers with AI & Technology</h1>
+        <p class="text-xl mt-4" data-aos="fade-up" data-aos-delay="300">Revolutionizing Agriculture Through Smart Solutions</p>
+        <a href="#features" class="mt-6 bg-green-500 px-6 py-3 text-white rounded-lg text-lg shadow-lg hover:bg-green-600 transition">Explore More</a>
+    </section>
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-gray-100 text-center" style="background-color:#fffffd";>
+        <h2 class="text-3xl font-bold mb-8">Our Key Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="feature-card bg-white p-6 rounded-lg shadow-lg" data-aos="zoom-in">
+                <h3 class="text-xl font-semibold">AI-Powered Chatbot</h3>
+                <p>Real-time guidance for farmers.</p>
+            </div>
+            <div class="feature-card bg-white p-6 rounded-lg shadow-lg" data-aos="zoom-in" data-aos-delay="200">
+                <h3 class="text-xl font-semibold">AI-Based Crop Prediction</h3>
+                <p>Predict the best crops to plant & fair market prices.</p>
+            </div>
+            <div class="feature-card bg-white p-6 rounded-lg shadow-lg" data-aos="zoom-in" data-aos-delay="400">
+                <h3 class="text-xl font-semibold">Government Policy Awareness</h3>
+                <p>Educates farmers about available schemes & subsidies.</p>
+            </div>
+        </div>
+    </section>
+    <!-- Chatbot Button -->
+<div class="fixed bottom-6 right-6 bg-gradient-to-r from-[#cbcd53] via-[#b0ba55] to-[#929b46] text-white p-4 rounded-full shadow-lg text-2xl hover:scale-110 transition flex items-center justify-center w-16 h-16"
+     onclick="document.getElementById('chatbox').classList.toggle('hidden')">
+    ✨
+</div>
+<!-- Chatbox Popup -->
+
+<!-- Chatbox Popup -->
+<div id="chatbox" class="hidden fixed bottom-20 right-6 bg-white w-80 shadow-xl rounded-lg overflow-hidden flex flex-col">
+    <!-- Chatbot Header -->
+   
+
+    <div class="bg-green-600 text-white p-4 flex justify-between items-center">
+        <span class="font-bold text-lg">Aasha - AI Assistance</span>
+        <button class="text-xl focus:outline-none" onclick="document.getElementById('chatbox').classList.add('hidden')">
+            &times;
+        </button>
+    </div>
+    
+    <!-- Chatbox Messages -->
+    <div class="p-4 h-60 overflow-y-auto space-y-2 flex flex-col" id="chatboxMessages">
+        <div class="chat-message bot-message bg-[#929b46] text-white p-2 rounded-lg w-fit max-w-[75%] self-start">
+            <b>Bot:</b> Hello! How can I help you today? 🌾
+        </div>
+    </div>
+    
+    <!-- Input Field -->
+    <div class="p-3 border-t flex items-center">
+        <input type="text" id="chatInput" class="flex-1 p-2 border rounded-lg outline-none" placeholder="Type your message..." 
+               onkeypress="if(event.key==='Enter') sendMessage()">
+        <button class="ml-2 bg-[#929b46] text-white p-2 rounded-lg focus:outline-none" onclick="sendMessage()">➡</button>
+    </div>
+</div>
+
+
+<script>
+    function sendMessage() {
+        let input = document.getElementById("chatInput");
+        let message = input.value.trim();
+        if (message === "") return;
+
+        let chatBox = document.getElementById("chatboxMessages");
+        
+        let userMessage = document.createElement("p");
+        userMessage.innerHTML = `<b>You:</b> ${message}`;
+        userMessage.className = "chat-message user-message";
+        chatBox.appendChild(userMessage);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        fetch("/get_response/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            let botMessage = document.createElement("p");
+            botMessage.innerHTML = `<b>Bot:</b> ${data.response || "Sorry, I didn't understand that."}`;
+            botMessage.className = "chat-message bot-message";
+            chatBox.appendChild(botMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        })
+        .catch(error => console.error("Error:", error));
+
+        input.value = "";
+    }
+
+    document.getElementById("chatInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            sendMessage();
+        }
+    });
+</script>
+
+
+    <!-- Footer Section -->
+    <footer class="bg-gray-900 text-white py-6 text-center">
+        <p>&copy; 2025 GrowKaro. All rights reserved.</p>
+        <div class="mt-4">
+            <a href="#" class="mx-2">Facebook</a>
+            <a href="#" class="mx-2">Twitter</a>
+            <a href="#" class="mx-2">Instagram</a>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init();
+        gsap.to("#welcomeText", { duration: 2, opacity: 1, y: -20, ease: "power2.out" });
+        function toggleSideMenu() {
+            const sideMenu = document.getElementById("sideMenu");
+            sideMenu.classList.toggle("show");
+        }
+    </script>
+    <script src="translate.js"></script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrowKaro - Har Kisan Ka Digital Sathi</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
+
+    <style>
+        .background-container {
+            background: url("{% static 'mybg.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+
+    <style>
+
+        
+
+        body {
+            background: url("{% static 'mybg.jpg' %}") no-repeat center center / cover;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #fffffd;
+            position: relative;
+        }
+        .chat-container {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 350px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat-box {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background: #cbcd53;
+            color: black;
+            align-self: flex-end;
+            text-align: right;
+        }
+        .bot-message {
+            background: #929b46;
+            color: white;
+            align-self: flex-start;
+            text-align: left;
+        }
+        .input-container {
+            display: flex;
+            margin-top: 10px;
+        }
+        .input-container input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .input-container button {
+            padding: 10px;
+            background: #b0ba55;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        .input-container button:hover {
+            background: #c7d163;
+        }
+        .chat-header {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .chat-header img {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="menu">
+        <span class="text-xl font-bold">🌿 GrowKaro</span>
+        <div class="menu-links">
+            <a href="#">Home</a>
+            <a href="#">About Us</a>
+            <a href="#">Contact Us</a>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <div class="background-container">
+    <section class="hero">
+        <h1 class="text-4xl font-bold mt-4" data-aos="fade-up">Empowering Farmers with AI & Technology</h1>
+        <p class="text-xl mt-4" data-aos="fade-up" data-aos-delay="300">Revolutionizing Agriculture Through Smart Solutions</p>
+        <br>
+        <a href="#features" class="mt-6 bg-green-500 px-6 py-3 text-white rounded-lg text-lg shadow-lg hover:bg-green-600 transition">Explore More</a>
+    </section>
+    
+    <!-- Chatbot Section -->
+    <div class="chat-container">
+        <div class="chat-header">
+            {% load static %}
+            <img src="{% static 'mybg.jpg' %}" alt="Farming Icon">
+            Aasha - Your Farming Assistant
+        </div>
+        <div class="chat-box" id="chat-box">
+            <div class="chat-message bot-message">Hello! How can I help you?</div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init();
+
+        function sendMessage() {
+            let input = document.getElementById("user-input");
+            let message = input.value.trim();
+            if (message === "") return;
+            let chatBox = document.getElementById("chat-box");
+            let userMessage = document.createElement("div");
+            userMessage.className = "chat-message user-message";
+            userMessage.innerText = message;
+            chatBox.appendChild(userMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            fetch("/get_response/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let botMessage = document.createElement("div");
+                botMessage.className = "chat-message bot-message";
+                botMessage.innerText = data.response || "Sorry, no response.";
+                chatBox.appendChild(botMessage);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(error => console.error("Error:", error));
+            input.value = "";
+        }
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
